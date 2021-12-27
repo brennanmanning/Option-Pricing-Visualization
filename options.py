@@ -1,28 +1,29 @@
 import numpy as np
 
-# Number of simulations
-B = 10000
 
-# Number of time steps
-N = 1001
+class GeometricBrownianMotion:
 
- # Parameters for the option
+    def __init__(self, drift, volatility, initial_val):
+        self.mu = drift
+        self.sigma = volatility
+        self.initial_val = initial_val
 
- S_0 = 100
- mu = 1.05
- sigma = 0.2
- r = 0.01
+    def get_drift(self):
+        return self.mu
 
-delta_t = 0.001
+    def get_volatility(self):
+        return self.sigma
 
-S = np.zeros((B, N))
-S[0,:] = S_0
+    def get_initial_value(self):
+        return self.initial_val
 
-Z = np.rand.normal((B, N-1))
- 
- for b in range(B):
-     for t in range(1,N): 
-         S[t,b] = S[t-1,b] * np.exp((r - sigma**2/2)*delta_t + Z[t,b] * sigma * np.sqrt(delta_t))
+    def generate_path(self, nr_steps):
+        dt = 1 / nr_steps
+        S = np.empty([nr_steps + 1, 1])
+        S[0] = self.initial_val
 
+        for i in range(nr_steps):
+            S[i+1] = S[i] * np.exp((self.mu - self.sigma**2 / 2) * dt +
+                                   self.sigma * np.random.normal(0, np.sqrt(dt)))
 
-# Then plot each path with an alpha of around 0.01 or 0.001
+        return S
