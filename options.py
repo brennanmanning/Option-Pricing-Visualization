@@ -35,8 +35,8 @@ class GeometricBrownianMotion:
             S[:, j] = self.generate_path(steps)
 
         t = np.linspace(0, 1, num = steps + 1)
-        fig, ax = plt.subplots()
-        ax.plot(t, S, color= "#ffffff", alpha = 0.01, figure = fig)
+        fig = plt.figure()
+        plt.plot(t, S, color= "#ffffff", alpha = 0.01, figure = fig)
         return fig
         
 
