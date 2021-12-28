@@ -36,7 +36,7 @@ class GeometricBrownianMotion:
 
         t = np.linspace(0, 1, num = steps + 1)
         fig = plt.figure()
-        plt.plot(t, S, color= "#ffffff", alpha = 0.01, figure = fig)
+        plt.plot(t, S, color= "#000000", alpha = 0.01, figure = fig)
         return fig
         
 
