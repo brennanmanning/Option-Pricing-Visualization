@@ -19,7 +19,7 @@ class GeometricBrownianMotion:
 
     def generate_path(self, steps):
         dt = 1 / steps
-        S = np.empty([steps + 1, 1])
+        S = np.empty([steps + 1])
         S[0] = self.initial_val
 
         for i in range(steps):
