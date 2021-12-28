@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import norm
 
 class GeometricBrownianMotion:
 
@@ -50,3 +51,19 @@ path1 = gbm.generate_path(100)
 path2 = gbm.generate_path(10)
 
 gbm_plot = gbm.plot_sample_paths(1000, 100)
+
+class EuropeanCallOption:
+
+    def __init__(self, gbm, strike, interest):
+        self.strike = strike
+        self.interest = interest
+        self.sigma = gbm.get_volatility()
+        self.initial_value = gbm.get_initial_value()
+
+    def get_price(self, time, current_price):
+        d1 = (np.log(current_price / self.strike) + (self.interest + self.sigma**2/2)* (1 - time))/(self.sigma* np.sqrt(1-time))
+        d2 = d1 - self.sigma * np.sqrt(1-time)
+
+        return current_price * norm.cdf(d1) - np.exp(-self.interest * (1- time)) * self.strike * norm.cdf(d2)
+
+    
