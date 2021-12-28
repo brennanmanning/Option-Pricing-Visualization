@@ -32,7 +32,7 @@ class GeometricBrownianMotion:
         S = np.empty([steps + 1, samples])
 
         for j in range(samples):
-            S[j,:] = self.generate_path(steps)
+            S[:, j] = self.generate_path(steps)
 
         t = np.linspace(0, 1, num = steps + 1)
         fig, ax = plt.subplots()
