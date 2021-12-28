@@ -36,8 +36,8 @@ class GeometricBrownianMotion:
 
         t = np.linspace(0, 1, num = steps + 1)
         fig, ax = plt.subplots()
-        ax.plot(t, S, color= "#ffffff", alpha = 0.01)
-        return ax
+        ax.plot(t, S, color= "#ffffff", alpha = 0.01, figure = fig)
+        return fig
         
 
 # Example Usage
