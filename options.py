@@ -72,8 +72,6 @@ class Option:
        self.initial_value = gbm.get_initial_value()
        self.value_fn = value_fn
 
-# See if making the value function dependent of gbm will helpful and how to implement it
-
 class EuropeanPutOption(Option):
 
     def __init__(self, gbm, strike, interest):
@@ -84,11 +82,16 @@ class EuropeanPutOption(Option):
             return np.maximum(K - S[-1], 0)
         Option.__init__(self, gbm, strike, interest, PutFunction)
 
-    def get_price(self, time, current_value):
+    def get_value(self, time, current_value):
         d1 = (np.log(current_value / self.strike) + (self.interest + self.sigma**2 / 2) * (1 - time))/(self.sigma * np.sqrt(1-time))
         d2 = d1 - self.sigma * np.sqrt(1 - time)
 
         return self.strike * np.exp(-self.interest * (1 - time)) * norm.cdf(-d2) - current_value * norm.cdf(-d1)
+
+    def get_price(self):
+        d1 = (np.log(self.initial_value / self.strike) + self.interest + self.sigma**2 / 2) / self.sigma
+        d2 = d1 - self.sigma
+        return self.strike * np.exp(-self.interest) * norm.cdf(-d2) - self.initial_value * norm.cdf(-d1)
 
 class EuropeanCallOption(Option):
 
@@ -99,10 +102,14 @@ class EuropeanCallOption(Option):
 
         Option.__init__(self, gbm, strike, interest, CallFunction)
 
-    def get_price(self, time, current_value):
+    def get_value(self, time, current_value):
         d1 = (np.log(current_value / self.strike) + (self.interest + self.sigma**2/2)* (1 - time))/(self.sigma* np.sqrt(1-time))
         d2 = d1 - self.sigma * np.sqrt(1-time)
 
         return current_value * norm.cdf(d1) - np.exp(-self.interest * (1- time)) * self.strike * norm.cdf(d2)
 
-   
+    def get_price(self):
+        d1 = (np.log(self.initial_value / self.strike) + self.interest + self.sigma**2 / 2) / self.sigma
+        d2 = d1 - self.sigma 
+        return self.initial_value * norm.cdf(d1)  - np.exp(-self.interest) * self.strike * norm.cdf(d2)
+
