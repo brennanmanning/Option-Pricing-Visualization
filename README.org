@@ -2,6 +2,7 @@
 
 This is a personal project that I am running to display some important aspects in option pricing. I will eventually want to have plots for
 - [x] Sample Paths from Geometric Brownian Motion
+- [ ] Plots for Paths from Binomial and Trinomial Trees
 - [ ] Pricing Surface for Various Options with Varying Parameters
 - [ ] Greeks
 
@@ -10,9 +11,43 @@ This is a personal project that I am running to display some important aspects i
 - [x] Implement Plotting for Geometric Brownian Motion Sample Paths
 - [x] Implement European Call Option Class
 - [x] Implement Method to Price European Call Options
-- [ ] Implement a Generalized Option Class
-- [ ] Restructure European Call Option to inherit properties from general Option Class
+- [x] Implement a Generalized Option Class
+- [x] Restructure European Call Option to inherit properties from general Option Class
 - [ ] Implement Monte Carlo Methods to price options and not just European Calls or Puts  
+- [ ] Implement Asian and other Exotic Options 
+- [ ] Plot the Pricing Surface for European Options
+- [ ] Plot the Pricing Surface for Asian and other Exotic Options
+- [ ] Plot the Greeks for European Options 
+- [ ] Plot the Greeks for Asian and Exotic Options
+- [ ] Implement a Binomial Tree Class
+- [ ] Implement a Trinomial Tree Class
+- [ ] Implement a American Option Class
+- [ ] Try to Implement American Option Class to be a Subclass of a general option class
+- [ ] Rewrite Option Class to allow for varying driving Stochastic Processes instead of just Geometric Brownian Motion 
 
 ** Goals
 One of my goals of this project is to get used to writing more object-oriented python code. Most of the python code I have written is mostly with scripting and writing basic functions, and I want to try a more object oriented approach for this project to see where it has its benefits. I am also trying to refresh on some of my knowledge of option pricing from my Stochastic Calculus class and to hopefully get a better understanding of some of the inner workings in modern option pricing.
+
+** Example Usage
+
+To define a Geometric Brownian Motion with drift 1, volatility 0.1, and initial value 1, use the GeometricBrownianMotion class as follows
+#+begin_src python
+    gbm = GeometricBrownianMotion(1, 0.1, 1)
+#+end_src
+
+To get  these values we can use the following methods
+#+begin_src python
+    gbm.get_drift()
+    gbm.get_volatility()
+    gbm.get_initial_value()
+#+end_src
+
+To get sample paths from the Geometric Brownian Motion, we can use the generate_path method. The generate_path method requires a parameter steps to be provided which is the number of steps we want to decompose the interval [0,1] into. We can generate a path with 100 steps with:
+#+begin_src python
+    gbm.generate_path(100)
+#+end_src
+
+To get a plot of possible sample paths, we can use the plot_sample_paths method. We need to pass in the number of steps each sample should have and the number of samples we want. To get a plot 1000 samples each with 100 steps, we can do this with
+#+begin_src python
+    gbm.plot_sample_paths(1000, 100)
+#+end_src
