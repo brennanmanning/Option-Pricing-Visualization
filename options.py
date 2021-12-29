@@ -52,6 +52,8 @@ path2 = gbm.generate_path(10)
 
 gbm_plot = gbm.plot_sample_paths(1000, 100)
 
+# Implement a method for plotting the pricing surface and make it so that this is a subclass of Options
+
 class EuropeanCallOption:
 
     def __init__(self, gbm, strike, interest):
@@ -67,6 +69,7 @@ class EuropeanCallOption:
         return current_price * norm.cdf(d1) - np.exp(-self.interest * (1- time)) * self.strike * norm.cdf(d2)
 
 
+# Need to figure out what the best way to declare value functions is, especially as we consider path dependent functions
 
 class Option:
 
@@ -78,6 +81,8 @@ class Option:
        self.sigma = gbm.get_volatility()
        self.initial_value = gbm.get_initial_value()
        self.value_fn = value_fn
+
+# See if making the value function dependent of gbm will helpful and how to implement it
 
 class EuropeanPutOption(Option):
 
