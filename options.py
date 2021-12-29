@@ -48,29 +48,15 @@ class GeometricBrownianMotion:
 # Example Usage
 
 # GBM with drift 0 and volatility 0.1 that starts at 1
-gbm = GeometricBrownianMotion(0, 0.1, 1)
+# gbm = GeometricBrownianMotion(0, 0.1, 1)
 
 # Sample Paths can be generated as follows
-path1 = gbm.generate_path(100)
-path2 = gbm.generate_path(10)
+# path1 = gbm.generate_path(100)
+# path2 = gbm.generate_path(10)
 
-gbm_plot = gbm.plot_sample_paths(1000, 100)
+# gbm_plot = gbm.plot_sample_paths(1000, 100)
 
 # Implement a method for plotting the pricing surface and make it so that this is a subclass of Options
-
-class EuropeanCallOption:
-
-    def __init__(self, gbm, strike, interest):
-        self.strike = strike
-        self.interest = interest
-        self.sigma = gbm.get_volatility()
-        self.initial_value = gbm.get_initial_value()
-
-    def get_price(self, time, current_price):
-        d1 = (np.log(current_price / self.strike) + (self.interest + self.sigma**2/2)* (1 - time))/(self.sigma* np.sqrt(1-time))
-        d2 = d1 - self.sigma * np.sqrt(1-time)
-
-        return current_price * norm.cdf(d1) - np.exp(-self.interest * (1- time)) * self.strike * norm.cdf(d2)
 
 
 # Need to figure out what the best way to declare value functions is, especially as we consider path dependent functions
@@ -91,6 +77,32 @@ class Option:
 class EuropeanPutOption(Option):
 
     def __init__(self, gbm, strike, interest):
+
+        # Right now we pass in a full path for the underlying function for our value function
+        # So, we could pass in gbm.true_path into PutFunction and get the value 
         def PutFunction(S, K):
-            return np.maximum(K - S, 0)
+            return np.maximum(K - S[-1], 0)
         Option.__init__(self, gbm, strike, interest, PutFunction)
+
+    def get_price(self, time, current_value):
+        d1 = (np.log(current_value / self.strike) + (self.interest + self.sigma**2 / 2) * (1 - time))/(self.sigma * np.sqrt(1-time))
+        d2 = d1 - self.sigma * np.sqrt(1 - time)
+
+        return self.strike * np.exp(-self.interest * (1 - time)) * norm.cdf(-d2) - current_value * norm.cdf(-d1)
+
+class EuropeanCallOption(Option):
+
+    def __init__(self, gbm, strike, interest):
+
+        def CallFunction(S, K):
+            return np.maximum(S[-1] - K, 0)
+
+        Option.__init__(self, gbm, strike, interest, CallFunction)
+
+    def get_price(self, time, current_value):
+        d1 = (np.log(current_value / self.strike) + (self.interest + self.sigma**2/2)* (1 - time))/(self.sigma* np.sqrt(1-time))
+        d2 = d1 - self.sigma * np.sqrt(1-time)
+
+        return current_value * norm.cdf(d1) - np.exp(-self.interest * (1- time)) * self.strike * norm.cdf(d2)
+
+   
