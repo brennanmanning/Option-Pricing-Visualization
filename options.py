@@ -8,6 +8,7 @@ class GeometricBrownianMotion:
         self.mu = drift
         self.sigma = volatility
         self.initial_val = initial_val
+        self.true_path = np.array([])
 
     def get_drift(self):
         return self.mu
@@ -28,6 +29,9 @@ class GeometricBrownianMotion:
                                    self.sigma * np.random.normal(0, np.sqrt(dt)))
 
         return S
+
+    def set_path(self, path):
+        self.true_path = path
 
     def plot_sample_paths(self, samples, steps):
         S = np.empty([steps + 1, samples])
