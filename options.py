@@ -66,4 +66,15 @@ class EuropeanCallOption:
 
         return current_price * norm.cdf(d1) - np.exp(-self.interest * (1- time)) * self.strike * norm.cdf(d2)
 
+class Option:
+
+    def __init__(self, gbm, strike, interest, value_fn):
+       self.gbm = gbm
+       self.strike = strike
+       self.interest = interest
+       self.mu =gbm.get_drift()
+       self.sigma = gbm.get_volatility()
+       self.initial_value = gbm.get_initial_value()
+       self.value_fn = value_fn
+
     
