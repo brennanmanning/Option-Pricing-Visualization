@@ -44,21 +44,6 @@ class GeometricBrownianMotion:
         plt.plot(t, S, color= "#000000", alpha = 0.01, figure = fig)
         return fig
         
-
-# Example Usage
-
-# GBM with drift 0 and volatility 0.1 that starts at 1
-# gbm = GeometricBrownianMotion(0, 0.1, 1)
-
-# Sample Paths can be generated as follows
-# path1 = gbm.generate_path(100)
-# path2 = gbm.generate_path(10)
-
-# gbm_plot = gbm.plot_sample_paths(1000, 100)
-
-# Implement a method for plotting the pricing surface and make it so that this is a subclass of Options
-
-
 # Need to figure out what the best way to declare value functions is, especially as we consider path dependent functions
 
 class Option:
@@ -71,6 +56,18 @@ class Option:
        self.sigma = gbm.get_volatility()
        self.initial_value = gbm.get_initial_value()
        self.value_fn = value_fn
+
+    def get_monte_carlo_price(self, steps, samples):
+        S = np.empty([steps +1, samples])
+        C = np.empty([samples])
+
+        for j in range(samples):
+            S[:, j] = self.gbm.generate_path(steps)
+            C[j] = self.value_fn(S[:,j])
+
+        return np.exp(-self.interest) * np.mean(C)
+
+        
 
 class EuropeanPutOption(Option):
 
