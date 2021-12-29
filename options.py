@@ -66,6 +66,8 @@ class EuropeanCallOption:
 
         return current_price * norm.cdf(d1) - np.exp(-self.interest * (1- time)) * self.strike * norm.cdf(d2)
 
+
+
 class Option:
 
     def __init__(self, gbm, strike, interest, value_fn):
@@ -77,4 +79,9 @@ class Option:
        self.initial_value = gbm.get_initial_value()
        self.value_fn = value_fn
 
-    
+class EuropeanPutOption(Option):
+
+    def __init__(self, gbm, strike, interest):
+        def PutFunction(S, K):
+            return np.maximum(K - S, 0)
+        Option.__init__(self, gbm, strike, interest, PutFunction)
