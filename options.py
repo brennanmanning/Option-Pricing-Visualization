@@ -86,7 +86,7 @@ class EuropeanOption(Option):
 
     def __init__(self, gbm, strike, interest, call):
         def EuropeanValue(S, K, c):
-            return np.maximum(S[-1] - K, 0)**c + np.maximum(K - S[-1], 0)**(1 - c)
+            return np.maximum(S[-1] - K, 0) * c + np.maximum(K - S[-1], 0) * (1 - c)
 
         Option.__init__(self, gbm, strike, interest, call, EuropeanValue)
     
@@ -110,7 +110,7 @@ class EuropeanOption(Option):
         x = np.linspace(0, low_price, high_price)
         T, X = np.meshgrid(t, x)
         c = self.get_value(T.ravel(), X.ravel()).reshape(X.shape)
-        c1 = np.maximum(x - self.strike, 0)** self.call + np.maximum(self.strike - x, 0)**(1 - self.call)
+        c1 = np.maximum(x - self.strike, 0) * self.call + np.maximum(self.strike - x, 0) * (1 - self.call)
         C = np.c_[c, c1]
         T = np.c_[T, np.ones(1000)]
         X = np.c_[X, x]
@@ -133,7 +133,7 @@ class AsianOption(Option):
     def __init__(self, gbm, strike, interest, call):
 
         def AsianValue(S, K, c):
-            return np.maximum(np.mean(S) - K, 0)** c + np.maximum(K - np.mean(S),0)**(1-c)
+            return np.maximum(np.mean(S) - K, 0) * c + np.maximum(K - np.mean(S),0) * (1-c)
         Option.__init__(self, gbm, strike, interest, call, AsianValue)
 
     
