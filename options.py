@@ -63,7 +63,7 @@ class Option:
 
         for j in range(samples):
             S[:, j] = self.gbm.generate_path(steps)
-            C[j] = self.value_fn(S[:,j])
+            C[j] = self.value_fn(S[:,j], self.strike)
 
         return np.exp(-self.interest) * np.mean(C)
 
