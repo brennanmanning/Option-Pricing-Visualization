@@ -52,7 +52,7 @@ class Option:
        self.gbm = gbm
        self.strike = strike
        self.interest = interest
-       self.mu =gbm.get_drift()
+       self.mu = gbm.get_drift()
        self.sigma = gbm.get_volatility()
        self.initial_value = gbm.get_initial_value()
        self.value_fn = value_fn
@@ -129,12 +129,19 @@ class EuropeanCallOption(Option):
         t = np.linspace(0, 0.999, 999)
         x = np.linspace(low_price, high_price, 1000)
         T, X = np.meshgrid(t,x)
-        c = self.get_value(T.ravel(), X.ravel())
-        C = c.reshape(X.shape)
+        c = self.get_value(T.ravel(), X.ravel()).reshape(X.shape)
+        c1 = np.maximum(x - self.strike, 0)
+        C = np.c_[c, c1]
+        T = np.c_[T, np.ones(1000)]
+        X = np.c_[X, x]
 
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection = '3d')
-        ax.plot_surface(T, X, C)
+        fig = plt.figure(figsize = (12,7))
+        ax = fig.add_subplot(111, projection = "3d")
+        surf = ax.plot_surface(T, X, C, cmap = "viridis")
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Stock Price")
+        ax.set_zlabel("Call Price")
+        fig.colorbar(surf, shrink = 0.6)
 
         return fig
 
