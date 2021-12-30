@@ -90,15 +90,18 @@ class EuropeanOption(Option):
 
         Option.__init__(self, gbm, strike, interest, call, EuropeanValue)
     
+    def get_d1(self, time, current_value):
+        return (np.log(current_value, self.strike) + (self.interest + self.sigma**2 / 2) * (1 - time))/(self.sigma * np.sqrt(1-time))
+
     def get_value(self, time, current_value):
-        d1 = (np.log(current_value / self.strike) + (self.interest + self.sigma**2 / 2) * (1 - time))/(self.sigma * np.sqrt(1-time))
+        d1 = self.get_d1(time, current_value)
         d2 = d1 - self.sigma * np.sqrt(1 - time)
         if self.call:
             return current_value * norm.cdf(d1) - np.exp(-self.interest * 1 - time) * self.strike * norm.cdf(d2)
         return self.strike * np.exp(-self.interest * (1 - time)) * norm.cdf(-d2) - current_value * norm.cdf(-d1)
 
     def get_price(self):
-        d1 = (np.log(self.initial_value / self.strike) + self.interest + self.sigma**2 / 2) / self.sigma
+        d1 = self.get_d1(0, self.initial_value)
         d2 = d1 - self.sigma
         if self.call:
             return self.initial_value * norm.cdf(d1) - np.exp(-self.interest) * self.strike * norm.cdf(d2)
@@ -124,6 +127,27 @@ class EuropeanOption(Option):
         fig.colorbar(surf, shrink = 0.6)
 
         return fig
+
+    def get_Delta(self, time, current_value):
+        return norm.cdf(self.get_d1(time, current_value))
+
+    def get_Delta_surface(self, low_price, high_price):
+        t = np.linspace(0, 0.999, 1000)
+        x = np.linspace(low_price, high_price, 1000)
+        T, X = np.meshgrid(t, x)
+        Z = self.get_d1(T.ravel(), X.ravel()).reshape(X.shape)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection = "3d")
+        surf = ax.plot_surface(T, X, Z, cmap = "viridis")
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Stock Price")
+        ax.set_zlabel(r"$\Delta$")
+        fig.colorbar(surf, shrink = 0.6)
+
+        return fig
+
+        
 
 # Arithmetic Asian Call Option
 # This could be extended to take in a parameter called "mean" to signify whether you want to use
