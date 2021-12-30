@@ -67,6 +67,20 @@ class Option:
 
         return np.exp(-self.interest) * np.mean(C)
 
+    def get_monte_carlo_simulation(self, steps, samples):
+        # Similar to get_monte_carlo_price but returns every sample path's resulting price
+        # Potential to merge the two and add  a verbose parameter to see if user wants simply the price
+        # or entire sample for debugging purposes
+
+        S = np.empty([steps + 1, samples])
+        C = np.empty([samples])
+
+        for j in range(samples):
+            S[:, j] = self.gbm.generate_path(steps)
+            C[j] = self.value_fn(S[:,j], self.strike)
+
+        return C
+
 
 class EuropeanPutOption(Option):
 
@@ -109,6 +123,20 @@ class EuropeanCallOption(Option):
         d2 = d1 - self.sigma 
         return self.initial_value * norm.cdf(d1)  - np.exp(-self.interest) * self.strike * norm.cdf(d2)
 
+    def get_pricing_surface(self, low_price, high_price):
+        # low_price and high_price are parameters needed for the stock price axis to determine
+        # the bounds of plotting
+        t = np.linspace(0, 0.999, 999)
+        x = np.linspace(low_price, high_price, 1000)
+        T, X = np.meshgrid(t,x)
+        c = self.get_value(T.ravel(), X.ravel())
+        C = c.reshape(X.shape)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection = '3d')
+        ax.plot_surface(T, X, C)
+
+        return fig
 
 # Arithmetic Asian Call Option
 # This could be extended to take in a parameter called "mean" to signify whether you want to use
