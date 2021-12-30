@@ -108,6 +108,16 @@ class EuropeanOption(Option):
 
         return self.strike * np.exp(-self.interest) * norm.cdf(-d2) - self.initial_value * norm.cdf(-d1)
 
+    def plot_option_surface(self, X, Y, Z, zlabel):
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection = "3d")
+        surf = ax.plot_surface(X, Y, Z, cmap = "viridis")
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Stock Price")
+        ax.set_zlabel(zlabel)
+        fig.colorbar(surf, shrink = 0.6)
+
+        return fig
     def get_pricing_surface(self, low_price, high_price):
         t = np.linspace(0, 0.999, 999)
         x = np.linspace(0, low_price, high_price)
@@ -118,15 +128,7 @@ class EuropeanOption(Option):
         T = np.c_[T, np.ones(1000)]
         X = np.c_[X, x]
 
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection = "3d")
-        surf = ax.plot_surface(T, X, C, cmap = "viridis")
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Stock Price")
-        ax.set_zlabel("Call Price")
-        fig.colorbar(surf, shrink = 0.6)
-
-        return fig
+        return self.plot_option_surface(T, X, C, "Option Price")
 
     def get_Delta(self, time, current_value):
         return norm.cdf(self.get_d1(time, current_value))
@@ -138,17 +140,17 @@ class EuropeanOption(Option):
         t = np.linspace(0, 0.999, 1000)
         x = np.linspace(low_price, high_price, 1000)
         T, X = np.meshgrid(t, x)
-        Z = self.get_d1(T.ravel(), X.ravel()).reshape(X.shape)
+        Z = self.get_Delta(T.ravel(), X.ravel()).reshape(X.shape)
 
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection = "3d")
-        surf = ax.plot_surface(T, X, Z, cmap = "viridis")
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Stock Price")
-        ax.set_zlabel(r"$\Delta$")
-        fig.colorbar(surf, shrink = 0.6)
+        return self.plot_option_surface(T, X, Z, r"$\Delta$")
 
-        return fig
+    def get_Gamma_surface(self, low_price, high_price):
+        t = np.linspace(0, 0.999, 1000)
+        x = np.linspace(low_price, high_price, 1000)
+        T, X = np.meshgrid(t, x)
+        Z = self.get_Gamma(T.ravel(), X.ravel()).reshape(X.shape)
+
+        return self.plot_option_surface(T, X, Z, r"$\Gamma$")
 
         
 
