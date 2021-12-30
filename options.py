@@ -67,7 +67,6 @@ class Option:
 
         return np.exp(-self.interest) * np.mean(C)
 
-        
 
 class EuropeanPutOption(Option):
 
@@ -110,3 +109,26 @@ class EuropeanCallOption(Option):
         d2 = d1 - self.sigma 
         return self.initial_value * norm.cdf(d1)  - np.exp(-self.interest) * self.strike * norm.cdf(d2)
 
+
+# Arithmetic Asian Call Option
+# This could be extended to take in a parameter called "mean" to signify whether you want to use
+# an arithmetic or a geometric mean
+class AsianCallOption(Option):
+
+    def __init__(self, gbm, strike, interest):
+
+        def AsianCallFunction(S, K):
+            return np.maximum(np.mean(S) - K, 0)
+
+        Option.__init__(self, gbm, strike, interest, AsianCallFunction)
+
+
+class AsianPutOption(Option):
+
+    def __init__(self, gbm, strike, interest):
+
+        def AsianPutFunction(S, K):
+            return np.maximum(K - np.mean(S), 0)
+
+        Option.__init__(self, gbm, strike, interest, AsianPutFunction)
+    
