@@ -48,13 +48,14 @@ class GeometricBrownianMotion:
 
 class Option:
 
-    def __init__(self, gbm, strike, interest, value_fn):
+    def __init__(self, gbm, strike, interest, call, value_fn):
        self.gbm = gbm
        self.strike = strike
        self.interest = interest
        self.mu = gbm.get_drift()
        self.sigma = gbm.get_volatility()
        self.initial_value = gbm.get_initial_value()
+       self.call = call
        self.value_fn = value_fn
 
     def get_monte_carlo_price(self, steps, samples):
@@ -81,85 +82,40 @@ class Option:
 
         return C
 
+class EuropeanOption(Option):
 
-class EuropeanPutOption(Option):
+    def __init__(self, gbm, strike, interest, call):
+        def EuropeanValue(S, K, c):
+            return np.maximum(S[-1] - K, 0)**c + np.maximum(K - S[-1], 0)**(1 - c)
 
-    def __init__(self, gbm, strike, interest):
-
-        # Right now we pass in a full path for the underlying function for our value function
-        # So, we could pass in gbm.true_path into PutFunction and get the value 
-        def PutFunction(S, K):
-            return np.maximum(K - S[-1], 0)
-        Option.__init__(self, gbm, strike, interest, PutFunction)
-
+        Option.__init__(self, gbm, strike, interest, call, EuropeanValue)
+    
     def get_value(self, time, current_value):
         d1 = (np.log(current_value / self.strike) + (self.interest + self.sigma**2 / 2) * (1 - time))/(self.sigma * np.sqrt(1-time))
         d2 = d1 - self.sigma * np.sqrt(1 - time)
-
+        if self.call:
+            return current_value * norm.cdf(d1) - np.exp(-self.interest * 1 - time) * self.strike * norm.cdf(d2)
         return self.strike * np.exp(-self.interest * (1 - time)) * norm.cdf(-d2) - current_value * norm.cdf(-d1)
 
     def get_price(self):
         d1 = (np.log(self.initial_value / self.strike) + self.interest + self.sigma**2 / 2) / self.sigma
         d2 = d1 - self.sigma
+        if self.call:
+            return self.initial_value * norm.cdf(d1) - np.exp(-self.interest) * self.strike * norm.cdf(d2)
+
         return self.strike * np.exp(-self.interest) * norm.cdf(-d2) - self.initial_value * norm.cdf(-d1)
 
     def get_pricing_surface(self, low_price, high_price):
-        # low_price and high_price are parameters needed for the stock price axis to determine
-        # the bounds of plotting
-
         t = np.linspace(0, 0.999, 999)
-        x = np.linspace(low_price, high_price, 1000)
+        x = np.linspace(0, low_price, high_price)
         T, X = np.meshgrid(t, x)
         c = self.get_value(T.ravel(), X.ravel()).reshape(X.shape)
-        c1 = np.maximum(self.strike - x, 0)
+        c1 = np.maximum(x - self.strike, 0)** self.call + np.maximum(self.strike - x, 0)**(1 - self.call)
         C = np.c_[c, c1]
         T = np.c_[T, np.ones(1000)]
         X = np.c_[X, x]
 
-        fig = plt.figure(figsize = (12,7))
-        ax = fig.add_subplot(111, projection = "3d")
-        surf = ax.plot_surface(T, X, C, cmap = "viridis")
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Stock Price")
-        ax.set_zlabel("Call Price")
-        fig.colorbar(surf, shrink = 0.6)
-
-        return fig
-        
-
-class EuropeanCallOption(Option):
-
-    def __init__(self, gbm, strike, interest):
-
-        def CallFunction(S, K):
-            return np.maximum(S[-1] - K, 0)
-
-        Option.__init__(self, gbm, strike, interest, CallFunction)
-
-    def get_value(self, time, current_value):
-        d1 = (np.log(current_value / self.strike) + (self.interest + self.sigma**2/2)* (1 - time))/(self.sigma* np.sqrt(1-time))
-        d2 = d1 - self.sigma * np.sqrt(1-time)
-
-        return current_value * norm.cdf(d1) - np.exp(-self.interest * (1- time)) * self.strike * norm.cdf(d2)
-
-    def get_price(self):
-        d1 = (np.log(self.initial_value / self.strike) + self.interest + self.sigma**2 / 2) / self.sigma
-        d2 = d1 - self.sigma 
-        return self.initial_value * norm.cdf(d1)  - np.exp(-self.interest) * self.strike * norm.cdf(d2)
-
-    def get_pricing_surface(self, low_price, high_price):
-        # low_price and high_price are parameters needed for the stock price axis to determine
-        # the bounds of plotting
-        t = np.linspace(0, 0.999, 999)
-        x = np.linspace(low_price, high_price, 1000)
-        T, X = np.meshgrid(t,x)
-        c = self.get_value(T.ravel(), X.ravel()).reshape(X.shape)
-        c1 = np.maximum(x - self.strike, 0)
-        C = np.c_[c, c1]
-        T = np.c_[T, np.ones(1000)]
-        X = np.c_[X, x]
-
-        fig = plt.figure(figsize = (12,7))
+        fig = plt.figure()
         ax = fig.add_subplot(111, projection = "3d")
         surf = ax.plot_surface(T, X, C, cmap = "viridis")
         ax.set_xlabel("Time")
@@ -172,22 +128,12 @@ class EuropeanCallOption(Option):
 # Arithmetic Asian Call Option
 # This could be extended to take in a parameter called "mean" to signify whether you want to use
 # an arithmetic or a geometric mean
-class AsianCallOption(Option):
+class AsianOption(Option):
 
-    def __init__(self, gbm, strike, interest):
+    def __init__(self, gbm, strike, interest, call):
 
-        def AsianCallFunction(S, K):
-            return np.maximum(np.mean(S) - K, 0)
+        def AsianValue(S, K, c):
+            return np.maximum(np.mean(S) - K, 0)** c + np.maximum(K - np.mean(S),0)**(1-c)
+        Option.__init__(self, gbm, strike, interest, call, AsianValue)
 
-        Option.__init__(self, gbm, strike, interest, AsianCallFunction)
-
-
-class AsianPutOption(Option):
-
-    def __init__(self, gbm, strike, interest):
-
-        def AsianPutFunction(S, K):
-            return np.maximum(K - np.mean(S), 0)
-
-        Option.__init__(self, gbm, strike, interest, AsianPutFunction)
     
