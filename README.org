@@ -16,7 +16,7 @@ This is a personal project that I am running to display some important aspects i
 - [x] Implement Monte Carlo Methods to price options and not just European Calls or Puts  
 - [x] Implement Asian and other Exotic Options 
 - [x] Plot the Pricing Surface for European Options
-- [ ]Merge Puts and Calls into a single class or create a new subclass for each type of option and another subclass for puts and one for calls 
+- [x]Merge Puts and Calls into a single class 
 - [ ] Plot the Pricing Surface for Asian and other Exotic Options
 - [ ] Plot the Greeks for European Options 
 - [ ] Plot the Greeks for Asian and Exotic Options
@@ -52,4 +52,48 @@ To get sample paths from the Geometric Brownian Motion, we can use the generate_
 To get a plot of possible sample paths, we can use the plot_sample_paths method. We need to pass in the number of steps each sample should have and the number of samples we want. To get a plot 1000 samples each with 100 steps, we can do this with
 #+begin_src python
     gbm.plot_sample_paths(1000, 100)
+#+end_src
+
+*** Option Class
+To define a generic Option, we need to provide some parameters: the underlying GeometricBrownianMotion object, the strike price, the risk-free interest rate, whether the option is call or not, and the function for the value of the option at maturity. So, to create a  call option with some value function f, we can do the following:
+#+begin_src python
+    gbm = GeometricBrownianMotion(mu, sigma, S)
+    strike = S - 10
+    interest_rate = 0.01 
+    call = 1
+    call_option = Option(gbm, strike, interest_rate, call, f)
+#+end_src
+Then, if we instead wanted a put option, we only need to make the change that
+#+begin_src python
+    call = 0
+#+end_src
+However, this forces us to write our function f nicely, so that it can handle both calls and puts.
+
+A nice feature that comes with writing general value functions is that we can easily price our option with Monte Carlo simulations. To get  a Monte Carlo estimate of the price of our call option, we simply need to use the get_monte_carlo_price method. This is can be done with:
+#+begin_src python
+    nr_samples = 100
+    nr_steps = 10
+    price = call_option.get_monte_carlo_price(nr_samples, nr_steps)
+#+end_src
+If we wanted more information from the Monte Carlo simulation, we could instead use the get_monte_carlo_simulation method which returns the price for each sample path instead of the sample mean of these. The syntax is the same as above, except we now get an array of prices.
+
+*** European Options
+It is also possible to just the EuropeanOption class to be able to define either a European Call Option or a European Put Option. The syntax is similar to that of the general Option class except you do not need to provide a value function to our call. Using the same parameters as in the Option Class, we can define a European Call Option as follows:
+#+begin_src python
+euro_call_option = EuropeanCallOption(gbm, strike, interest_rate, call)
+#+end_src
+
+There are some useful methods for European Options. One of them is that we can use methods on the class to get the value of the option at a certain point or to get the price at the initial time. To get the value of the option at the halfway point to maturity where the stock has a current value of 100, we would call
+#+begin_src python
+euro_call_option.get_value(0.5, 100)
+#+end_src
+If we instead wanted the price, we would just need to call
+#+begin_src python
+euro_call_option.get_price()
+#+end_src
+We don't need to specify a current price, as the gbm we gave to the option has stored the initial value of the underlying process.
+
+We can also use this class to get the pricing surface for European Options. The only parameters we need for this are for indexing the stock price axis of our surface. To get the pricing surface for stock prices between 75 and 150, simply call
+#+begin_src python
+euro_call_option.get_pricing_surface(75, 150)
 #+end_src
