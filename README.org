@@ -16,6 +16,7 @@ This is a personal project that I am running to display some important aspects i
 - [x] Implement Monte Carlo Methods to price options and not just European Calls or Puts  
 - [x] Implement Asian and other Exotic Options 
 - [x] Plot the Pricing Surface for European Options
+- [ ]Merge Puts and Calls into a single class or create a new subclass for each type of option and another subclass for puts and one for calls 
 - [ ] Plot the Pricing Surface for Asian and other Exotic Options
 - [ ] Plot the Greeks for European Options 
 - [ ] Plot the Greeks for Asian and Exotic Options
