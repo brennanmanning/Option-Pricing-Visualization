@@ -131,6 +131,9 @@ class EuropeanOption(Option):
     def get_Delta(self, time, current_value):
         return norm.cdf(self.get_d1(time, current_value))
 
+    def get_Gamma(self, time, current_value):
+        return norm.pdf(self.get_d1(time, current_value)) / (current_value * self.sigma * np.sqrt(1 - time))
+
     def get_Delta_surface(self, low_price, high_price):
         t = np.linspace(0, 0.999, 1000)
         x = np.linspace(low_price, high_price, 1000)
