@@ -89,7 +89,7 @@ class EuropeanOption(Option):
         Option.__init__(self, gbm, strike, interest, call, EuropeanValue)
     
     def get_d1(self, time, current_value):
-        return (np.log(current_value, self.strike) + (self.interest + self.sigma**2 / 2) * (1 - time))/(self.sigma * np.sqrt(1-time))
+        return (np.log(current_value/ self.strike) + (self.interest + self.sigma**2 / 2) * (1 - time))/(self.sigma * np.sqrt(1-time))
 
     def get_value(self, time, current_value):
         d1 = self.get_d1(time, current_value)
