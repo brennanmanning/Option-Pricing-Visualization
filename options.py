@@ -33,6 +33,9 @@ class GeometricBrownianMotion:
     def set_path(self, path):
         self.true_path = path
 
+    def set_drift(self, new_drift):
+        self.mu = new_drift
+
     def plot_sample_paths(self, samples, steps):
         S = np.empty([steps + 1, samples])
 
