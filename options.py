@@ -138,6 +138,14 @@ class EuropeanOption(Option):
         d2 = self.get_d1(time, current_value) - self.sigma * np.sqrt(1 - time) 
         return - self.strike * np.exp(-self.interest * (1 - time)) * (self.interest * norm.cdf(d2) + norm.pdf(d2) * self.sigma/ (2 * np.sqrt(1 - time)))
 
+    def get_Vega(self, time, current_value):
+        d2 = self.get_d1(time, current_value) - self.sigma * np.sqrt(1 - time)
+        return np.sqrt(1 - time) * self.strike * np.exp(-self.interest * (1 - time)) * norm.pdf(d2)
+
+    def get_Rho(self, time, current_value):
+        d2 = self.get_d1(time, current_value) - self.sigma * np.sqrt(1 - time)
+        return np.sqrt(1 -time) * self.strike * np.exp(-r * (1 - time)) * norm.cdf(d2)
+        
     def get_Delta_surface(self, low_price, high_price):
         t = np.linspace(0, 0.999, 1000)
         x = np.linspace(low_price, high_price, 1000)
@@ -162,6 +170,21 @@ class EuropeanOption(Option):
 
         return self.plot_option_surface(T, X, Z, r"$\Theta$")
 
+    def get_Vega_surface(self, low_price, high_price):
+        t = np.linspace(0, 0.999, 1000)
+        x = np.linspace(low_price, high_price, 1000)
+        T, X = np.meshgrid(t, x)
+        Z = self.get_Vega(T.ravel(), X.ravel()).reshape(X.shape)
+
+        return self.plot_option_surface(T, X, Z, r"$\mathcal{V}$")
+
+    def get_rho_surface(self, low_price, high_price):
+        t = np.linspace(0, 0.999, 1000)
+        x = np.linspace(low_price, high_price, 1000)
+        T, X = np.meshgrid(t, x)
+        Z = self.get_Vega(T.ravel(), X.ravel()).reshape(X.shape)
+
+        return self.plot_option_surface(T, X, Z, r"$\rho$")
         
 
 # Arithmetic Asian Call Option
