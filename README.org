@@ -17,7 +17,9 @@ This is a personal project that I am running to display some important aspects i
 - [x] Implement Asian and other Exotic Options 
 - [x] Plot the Pricing Surface for European Options
 - [x]Merge Puts and Calls into a single class 
-- [ ] Plot the Greeks for European Options 
+- [x] Plot the Greeks for European Call Options 
+- [ ] Plot the Greeks for European Put Options 
+- [ ] Implement Finite Difference Methods to solve and visualize exotic options
 - [ ] Implement a Binomial Tree Class
 - [ ] Implement a Trinomial Tree Class
 - [ ] Implement a American Option Class
