@@ -136,7 +136,7 @@ class EuropeanOption(Option):
 
     def get_Theta(self, time, current_value):
         d2 = self.get_d1(time, current_value) - self.sigma * np.sqrt(1 - time) 
-        return - self.strike * np.exp(-self.interest * (1 - time)) * (r * norm.cdf(d2) + norm.pdf(d2) * self.sigma/ (2 * np.sqrt(1 - time)))
+        return - self.strike * np.exp(-self.interest * (1 - time)) * (self.interest * norm.cdf(d2) + norm.pdf(d2) * self.sigma/ (2 * np.sqrt(1 - time)))
 
     def get_Delta_surface(self, low_price, high_price):
         t = np.linspace(0, 0.999, 1000)
