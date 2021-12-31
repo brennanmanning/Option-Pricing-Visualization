@@ -44,8 +44,6 @@ class GeometricBrownianMotion:
         plt.plot(t, S, color= "#000000", alpha = 0.01, figure = fig)
         return fig
         
-# Need to figure out what the best way to declare value functions is, especially as we consider path dependent functions
-
 class Option:
 
     def __init__(self, gbm, strike, interest, call, value_fn):
@@ -136,6 +134,10 @@ class EuropeanOption(Option):
     def get_Gamma(self, time, current_value):
         return norm.pdf(self.get_d1(time, current_value)) / (current_value * self.sigma * np.sqrt(1 - time))
 
+    def get_Theta(self, time, current_value):
+        d2 = self.get_d1(time, current_value) - self.sigma * np.sqrt(1 - time) 
+        return - self.strike * np.exp(-self.interest * (1 - time)) * (r * norm.cdf(d2) + norm.pdf(d2) * self.sigma/ (2 * np.sqrt(1 - time)))
+
     def get_Delta_surface(self, low_price, high_price):
         t = np.linspace(0, 0.999, 1000)
         x = np.linspace(low_price, high_price, 1000)
@@ -151,6 +153,14 @@ class EuropeanOption(Option):
         Z = self.get_Gamma(T.ravel(), X.ravel()).reshape(X.shape)
 
         return self.plot_option_surface(T, X, Z, r"$\Gamma$")
+
+    def get_Theta_surface(self, low_price, high_price):
+        t = np.linspace(0, 0.999, 1000)
+        x = np.linspace(low_price, high_price, 1000)
+        T, X = np.meshgrid(t, x)
+        Z = self.get_Theta(T.ravel(), X.ravel()).reshape(X.shape)
+
+        return self.plot_option_surface(T, X, Z, r"$\Theta$")
 
         
 
