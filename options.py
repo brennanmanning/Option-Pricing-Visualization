@@ -118,7 +118,7 @@ class EuropeanOption(Option):
         return fig
     def get_pricing_surface(self, low_price, high_price):
         t = np.linspace(0, 0.999, 999)
-        x = np.linspace(low_price, high_price, 999)
+        x = np.linspace(low_price, high_price, 1000)
         T, X = np.meshgrid(t, x)
         c = self.get_value(T.ravel(), X.ravel()).reshape(X.shape)
         c1 = np.maximum(x - self.strike, 0) * self.call + np.maximum(self.strike - x, 0) * (1 - self.call)
