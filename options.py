@@ -129,14 +129,19 @@ class EuropeanOption(Option):
         return self.plot_option_surface(T, X, C, "Option Price")
 
     def get_Delta(self, time, current_value):
-        return norm.cdf(self.get_d1(time, current_value))
+        if self.call:
+            return norm.cdf(self.get_d1(time, current_value))
+        return norm.cdf(self.get_d1(time, current_value)) - 1
 
     def get_Gamma(self, time, current_value):
         return norm.pdf(self.get_d1(time, current_value)) / (current_value * self.sigma * np.sqrt(1 - time))
 
     def get_Theta(self, time, current_value):
-        d2 = self.get_d1(time, current_value) - self.sigma * np.sqrt(1 - time) 
-        return - self.strike * np.exp(-self.interest * (1 - time)) * (self.interest * norm.cdf(d2) + norm.pdf(d2) * self.sigma/ (2 * np.sqrt(1 - time)))
+        d1 = self.get_d1(time, current_value)
+        d2 = d1 - self.sigma * np.sqrt(1 - time) 
+        if self.call:
+            return - (current_value * norm.pdf(d1) * self.sigma) / (2 * np.sqrt(1 - time)) - self.interest * self.strike * np.exp(- self.interest * (1 -time)) * norm.cdf(d2)
+        return - (current_value * norm.pdf(d1) * self.sigma) / (2 * np.sqrt(1 - time)) + self.interest * self.strike * np.exp(- self.interest * (1 - time)) * norm.cdf(-d2)
 
     def get_Vega(self, time, current_value):
         d2 = self.get_d1(time, current_value) - self.sigma * np.sqrt(1 - time)
@@ -144,7 +149,9 @@ class EuropeanOption(Option):
 
     def get_Rho(self, time, current_value):
         d2 = self.get_d1(time, current_value) - self.sigma * np.sqrt(1 - time)
-        return np.sqrt(1 -time) * self.strike * np.exp(-r * (1 - time)) * norm.cdf(d2)
+        if self.call:
+            return self.strike * (1 - time) * np.exp(self.interest * (1 -time)) * norm.cdf(d2)
+        return - self.strike * (1 -time) * np.exp(self.interest * (1 - time)) * norm.cdf(-d2)
         
     def get_Delta_surface(self, low_price, high_price):
         t = np.linspace(0, 0.999, 1000)
