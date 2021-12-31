@@ -60,8 +60,11 @@ class Option:
        self.value_fn = value_fn
 
     def get_monte_carlo_price(self, steps, samples):
+        # Need to switch to risk-neutral measure for generating sample paths
         S = np.empty([steps +1, samples])
         C = np.empty([samples])
+
+        self.gbm.set_drift(self.interest)
 
         for j in range(samples):
             S[:, j] = self.gbm.generate_path(steps)
@@ -77,9 +80,11 @@ class Option:
         S = np.empty([steps + 1, samples])
         C = np.empty([samples])
 
+        self.gbm.set_drift(self.interest)
+
         for j in range(samples):
             S[:, j] = self.gbm.generate_path(steps)
-            C[j] = self.value_fn(S[:,j], self.strike, call)
+            C[j] = self.value_fn(S[:,j], self.strike, self.call)
 
         return C
 
