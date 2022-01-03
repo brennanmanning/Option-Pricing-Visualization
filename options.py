@@ -1,3 +1,4 @@
+from os import get_blocking
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
@@ -45,6 +46,48 @@ class GeometricBrownianMotion:
         t = np.linspace(0, 1, num = steps + 1)
         fig = plt.figure()
         plt.plot(t, S, color= "#000000", alpha = 0.01, figure = fig)
+        return fig
+
+class BinomialTree:
+
+    def __init__(self, volatility, initial_val, steps):
+        self.sigma = volatility
+        self.initial_val = initial_val
+        self.steps = steps
+        self.delta_t = 1 / self.steps
+        self.u = np.exp(self.sigma * np.sqrt(self.delta_t))
+        self.d = np.exp(- self.sigma * np.sqrt(self.delta_t))
+
+    def get_binomial_tree(self):
+        S = np.zeros([self.steps + 1, self.steps + 1])
+        S[0, 0] = self.initial_val
+        for i in range(1, self.steps + 1):
+            for j in range(i + 1):
+                S[j, i] = S[0, 0] * self.u**(i - j) * self.d**j
+
+        return S 
+
+    def get_binomial_path(self, q):
+        # q is the probability of going up at a step and is not necessarily the risk-neutral probability 
+        rand_draw = np.random.uniform(0, 1, self.steps)
+        up_seq = rand_draw < q
+        S = np.empty([self.steps + 1])
+        S[0] = self.initial_val
+        for i in range(1, self.steps + 1):
+            S[i] = S[i-1] * self.u**up_seq[i -1] * self.d**(1 - up_seq[i - 1])
+
+        return S
+ 
+    def plot_sample_paths(self, q, samples):
+        S = np.empty([self.steps + 1, samples]) 
+
+        for i in range(samples):
+            S[:, i] = self.get_binomial_path(q)
+
+        t = np.linspace(0, 1, self.steps + 1)
+        fig = plt.figure()
+        plt.plot(t, S, color= "#000000", alpha = 0.01, figure = fig)
+
         return fig
         
 class Option:
