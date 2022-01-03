@@ -1,6 +1,6 @@
 * Option Pricing Visualization
 
-This is a personal project that I am running to display some important aspects in option pricing. I will eventually want to have plots for
+This is a personal project that I am running to help me understand some concepts in Option Pricing. For the most part, this is focused on getting visualizations for most concepts. However, if there is a concept that could be implemented and helps with my understanding, then I want to implement this. A main goal is the ability to get plots for the following concepts with varying parameters:
 - [x] Sample Paths from Geometric Brownian Motion
 - [x] Pricing Surface for Various Options with Varying Parameters
 - [x] Greeks
@@ -19,7 +19,7 @@ This is a personal project that I am running to display some important aspects i
 - [x]Merge Puts and Calls into a single class 
 - [x] Plot the Greeks for European Call Options 
 - [x] Plot the Greeks for European Put Options 
-- [ ] Implement a Binomial Tree Class
+- [x] Implement a Binomial Tree Class
 - [ ] Implement a Trinomial Tree Class
 
 ** Goals
