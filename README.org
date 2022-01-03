@@ -3,8 +3,8 @@
 This is a personal project that I am running to display some important aspects in option pricing. I will eventually want to have plots for
 - [x] Sample Paths from Geometric Brownian Motion
 - [x] Pricing Surface for Various Options with Varying Parameters
+- [x] Greeks
 - [ ] Plots for Paths from Binomial and Trinomial Trees
-- [ ] Greeks
 
 ** Todos
 - [x] Implement Geometric Brownian Motion Class
@@ -19,13 +19,8 @@ This is a personal project that I am running to display some important aspects i
 - [x]Merge Puts and Calls into a single class 
 - [x] Plot the Greeks for European Call Options 
 - [x] Plot the Greeks for European Put Options 
-- [ ] Implement Finite Difference Methods 
-- [ ] Use Finite Differences to Solve and Visualize exotic options
 - [ ] Implement a Binomial Tree Class
 - [ ] Implement a Trinomial Tree Class
-- [ ] Implement a American Option Class
-- [ ] Try to Implement American Option Class to be a Subclass of a general option class
-- [ ] Rewrite Option Class to allow for varying driving Stochastic Processes instead of just Geometric Brownian Motion 
 
 ** Goals
 One of my goals of this project is to get used to writing more object-oriented python code. Most of the python code I have written is mostly with scripting and writing basic functions, and I want to try a more object oriented approach for this project to see where it has its benefits. I am also trying to refresh on some of my knowledge of option pricing from my Stochastic Calculus class and to hopefully get a better understanding of some of the inner workings in modern option pricing.
