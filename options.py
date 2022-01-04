@@ -250,10 +250,12 @@ class EuropeanOption(Option):
 # an arithmetic or a geometric mean
 class AsianOption(Option):
 
-    def __init__(self, gbm, strike, interest, call):
+    def __init__(self, gbm, strike, interest, call, fixed):
 
         def AsianValue(S, K, c):
-            return np.maximum(np.mean(S) - K, 0) * c + np.maximum(K - np.mean(S),0) * (1-c)
+            if fixed:
+                return np.maximum(np.mean(S) - K, 0) * c + np.maximum(K - np.mean(S),0) * (1-c)
+            return np.maximum(S[-1] - np.mean(S), 0) * c + np.maximum(np.mean(S) - S[-1], 0) ** (1 - c)
         Option.__init__(self, gbm, strike, interest, call, AsianValue)
 
     
