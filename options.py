@@ -71,7 +71,7 @@ class BinomialTree:
         # q is the probability of going up at a step and is not necessarily the risk-neutral probability 
         rand_draw = np.random.uniform(0, 1, self.steps)
         up_seq = rand_draw < q
-        S = np.empty([self.steps + 1])
+        S = np.empty(self.steps + 1)
         S[0] = self.initial_val
         for i in range(1, self.steps + 1):
             S[i] = S[i-1] * self.u**up_seq[i -1] * self.d**(1 - up_seq[i - 1])
@@ -89,6 +89,70 @@ class BinomialTree:
         plt.plot(t, S, color= "#000000", alpha = 0.01, figure = fig)
 
         return fig
+
+class TrinomialTree:
+
+    def __init__(self, volatility, initial_val, steps, interest):
+        self.sigma = volatility
+        self.initial_val = initial_val
+        self.steps = steps
+        self.delta_t = 1 / steps
+        self.interest = interest
+        self.u = np.exp(self.sigma * np.sqrt(2 * self.delta_t))
+        self.d = np.exp(-self.sigma * np.sqrt(2 * self.delta_t))
+        self.p_u = ((np.exp(self.interest * self.delta_t / 2) - self.d) / (self.u - self.d))**2
+        self.p_d = ((self.u - np.exp(self.interest * self.delta_t / 2)) / (self.u - self.d))**2
+        self.p_m = 1 - self.p_u - self.p_d
+
+    def get_trinomial_tree(self):
+        S = np.zeros([2 * self.steps + 1, self.steps + 1])
+        S[0, 0] = self.initial_val
+        for j in range(1, self.steps + 1):
+            for i in range(2 * j + 1):
+                S[i,j] = self.initial_val * self.u**j * self.d**i
+
+        return S
+
+    def get_trinomial_path(self):
+        rand_draw = np.random.uniform(0, 1, self.steps)
+        def interval(x):
+            if x < self.p_u:
+                return 0
+            elif x < self.p_u + self.p_d:
+                return 1
+            else:
+                return 2
+        vec_interval = np.vectorize(interval)
+        seq = vec_interval(rand_draw)
+        up_seq = down_seq = np.zeros(self.steps)
+        for i in range(self.steps):
+            if seq[i] == 0:
+                up_seq[i] = 1
+            elif seq[i] == 1:
+                down_seq[i] = 1
+
+        S = np.empty(self.steps + 1)
+        S[0] = self.initial_val
+        for i in range(1, self.steps + 1):
+            S[i] = S[i-1] * self.u ** up_seq[i] * self.d ** down_seq[i] 
+
+        return S
+
+    def plot_sample_paths(self, samples):
+        S = np.empty([self.steps + 1, samples])
+
+        for i in range(samples):
+            S[:, i] = self.get_trinomial_path()
+
+        t = np.linspace(0, 1, self.steps + 1)
+        fig = plt.figure()
+        plt.plot(t, S, alpha = 0.01, color = "#000000", figure = fig)
+
+        return fig
+        
+
+        
+        
         
 class Option:
 
