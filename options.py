@@ -10,15 +10,6 @@ class GeometricBrownianMotion:
         self.initial_val = initial_val
         self.true_path = np.array([])
 
-    def get_drift(self):
-        return self.mu
-
-    def get_volatility(self):
-        return self.sigma
-
-    def get_initial_value(self):
-        return self.initial_val
-
     def generate_path(self, steps):
         dt = 1 / steps
         S = np.empty([steps + 1])
@@ -30,13 +21,10 @@ class GeometricBrownianMotion:
 
         return S
 
-    def set_path(self, path):
-        self.true_path = path
-
     def set_drift(self, new_drift):
         self.mu = new_drift
 
-    def plot_sample_paths(self, samples, steps):
+    def plot_sample_paths(self, samples, steps, alpha):
         S = np.empty([steps + 1, samples])
 
         for j in range(samples):
@@ -44,7 +32,7 @@ class GeometricBrownianMotion:
 
         t = np.linspace(0, 1, num = steps + 1)
         fig = plt.figure()
-        plt.plot(t, S, color= "#000000", alpha = 0.01, figure = fig)
+        plt.plot(t, S, color= "#000000", alpha = alpha, figure = fig)
         return fig
 
 class BinomialTree:
@@ -77,7 +65,7 @@ class BinomialTree:
 
         return S
  
-    def plot_sample_paths(self, q, samples):
+    def plot_sample_paths(self, q, samples, alpha):
         S = np.empty([self.steps + 1, samples]) 
 
         for i in range(samples):
@@ -85,7 +73,7 @@ class BinomialTree:
 
         t = np.linspace(0, 1, self.steps + 1)
         fig = plt.figure()
-        plt.plot(t, S, color= "#000000", alpha = 0.01, figure = fig)
+        plt.plot(t, S, color= "#000000", alpha = alpha, figure = fig)
 
         return fig
 
@@ -137,7 +125,7 @@ class TrinomialTree:
 
         return S
 
-    def plot_sample_paths(self, samples):
+    def plot_sample_paths(self, samples, alpha):
         S = np.empty([self.steps + 1, samples])
 
         for i in range(samples):
@@ -145,13 +133,9 @@ class TrinomialTree:
 
         t = np.linspace(0, 1, self.steps + 1)
         fig = plt.figure()
-        plt.plot(t, S, alpha = 0.01, color = "#000000", figure = fig)
+        plt.plot(t, S, alpha = alpha, color = "#000000", figure = fig)
 
         return fig
-        
-
-        
-        
         
 class Option:
 
@@ -230,6 +214,7 @@ class EuropeanOption(Option):
         fig.colorbar(surf, shrink = 0.6)
 
         return fig
+
     def get_pricing_surface(self, low_price, high_price):
         t = np.linspace(0, 0.999, 999)
         x = np.linspace(low_price, high_price, 1000)
