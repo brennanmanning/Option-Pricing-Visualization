@@ -151,9 +151,9 @@ class Option:
        self.gbm = gbm
        self.strike = strike
        self.interest = interest
-       self.mu = gbm.get_drift()
-       self.sigma = gbm.get_volatility()
-       self.initial_value = gbm.get_initial_value()
+       self.mu = gbm.mu
+       self.sigma = gbm.sigma
+       self.initial_value = gbm.initial_val
        self.call = call
        self.value_fn = value_fn
 
@@ -212,18 +212,17 @@ class EuropeanOption(Option):
 
         return self.strike * np.exp(-self.interest) * norm.cdf(-d2) - self.initial_value * norm.cdf(-d1)
 
-    def plot_option_surface(self, X, Y, Z, zlabel):
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection = "3d")
+    def plot_option_surface(self, X, Y, Z, zlabel, ax):
+        if ax is None:
+            fig, ax = plt.subplots(projection = "3d")
         surf = ax.plot_surface(X, Y, Z, cmap = "viridis")
         ax.set_xlabel("Time")
         ax.set_ylabel("Stock Price")
         ax.set_zlabel(zlabel)
-        fig.colorbar(surf, shrink = 0.6)
 
-        return fig
+        return ax
 
-    def get_pricing_surface(self, low_price, high_price):
+    def get_pricing_surface(self, low_price, high_price, ax = None):
         t = np.linspace(0, 0.999, 999)
         x = np.linspace(low_price, high_price, 1000)
         T, X = np.meshgrid(t, x)
@@ -233,7 +232,7 @@ class EuropeanOption(Option):
         T = np.c_[T, np.ones(1000)]
         X = np.c_[X, x]
 
-        return self.plot_option_surface(T, X, C, "Option Price")
+        return self.plot_option_surface(T, X, C, "Option Price", ax)
 
     def get_Delta(self, time, current_value):
         if self.call:
@@ -260,45 +259,45 @@ class EuropeanOption(Option):
             return self.strike * (1 - time) * np.exp(self.interest * (1 -time)) * norm.cdf(d2)
         return - self.strike * (1 -time) * np.exp(self.interest * (1 - time)) * norm.cdf(-d2)
         
-    def get_Delta_surface(self, low_price, high_price):
+    def get_Delta_surface(self, low_price, high_price, ax = None):
         t = np.linspace(0, 0.999, 1000)
         x = np.linspace(low_price, high_price, 1000)
         T, X = np.meshgrid(t, x)
         Z = self.get_Delta(T.ravel(), X.ravel()).reshape(X.shape)
 
-        return self.plot_option_surface(T, X, Z, r"$\Delta$")
+        return self.plot_option_surface(T, X, Z, r"$\Delta$", ax)
 
-    def get_Gamma_surface(self, low_price, high_price):
+    def get_Gamma_surface(self, low_price, high_price, ax = None):
         t = np.linspace(0, 0.999, 1000)
         x = np.linspace(low_price, high_price, 1000)
         T, X = np.meshgrid(t, x)
         Z = self.get_Gamma(T.ravel(), X.ravel()).reshape(X.shape)
 
-        return self.plot_option_surface(T, X, Z, r"$\Gamma$")
+        return self.plot_option_surface(T, X, Z, r"$\Gamma$", ax)
 
-    def get_Theta_surface(self, low_price, high_price):
+    def get_Theta_surface(self, low_price, high_price, ax = None):
         t = np.linspace(0, 0.999, 1000)
         x = np.linspace(low_price, high_price, 1000)
         T, X = np.meshgrid(t, x)
         Z = self.get_Theta(T.ravel(), X.ravel()).reshape(X.shape)
 
-        return self.plot_option_surface(T, X, Z, r"$\Theta$")
+        return self.plot_option_surface(T, X, Z, r"$\Theta$", ax)
 
-    def get_Vega_surface(self, low_price, high_price):
+    def get_Vega_surface(self, low_price, high_price, ax = None):
         t = np.linspace(0, 0.999, 1000)
         x = np.linspace(low_price, high_price, 1000)
         T, X = np.meshgrid(t, x)
         Z = self.get_Vega(T.ravel(), X.ravel()).reshape(X.shape)
 
-        return self.plot_option_surface(T, X, Z, r"$\mathcal{V}$")
+        return self.plot_option_surface(T, X, Z, r"$\mathcal{V}$", ax)
 
-    def get_rho_surface(self, low_price, high_price):
+    def get_rho_surface(self, low_price, high_price, ax = None):
         t = np.linspace(0, 0.999, 1000)
         x = np.linspace(low_price, high_price, 1000)
         T, X = np.meshgrid(t, x)
         Z = self.get_Vega(T.ravel(), X.ravel()).reshape(X.shape)
 
-        return self.plot_option_surface(T, X, Z, r"$\rho$")
+        return self.plot_option_surface(T, X, Z, r"$\rho$", ax)
         
 
 # Arithmetic Asian Call Option
@@ -311,7 +310,7 @@ class AsianOption(Option):
         def AsianValue(S, K, c):
             if fixed:
                 return np.maximum(np.mean(S) - K, 0) * c + np.maximum(K - np.mean(S),0) * (1-c)
-            return np.maximum(S[-1] - np.mean(S), 0) * c + np.maximum(np.mean(S) - S[-1], 0) ** (1 - c)
+            return np.maximum(S[-1] - np.mean(S), 0) * c + np.maximum(np.mean(S) - S[-1], 0) * (1 - c)
         Option.__init__(self, gbm, strike, interest, call, AsianValue)
 
     
