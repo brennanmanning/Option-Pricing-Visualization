@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
+
 class GeometricBrownianMotion:
 
     def __init__(self, drift, volatility, initial_val):
@@ -24,16 +25,20 @@ class GeometricBrownianMotion:
     def set_drift(self, new_drift):
         self.mu = new_drift
 
-    def plot_sample_paths(self, samples, steps, alpha):
+    def plot_sample_paths(self, samples, steps, alpha = 0.1, ax = None):
         S = np.empty([steps + 1, samples])
 
         for j in range(samples):
             S[:, j] = self.generate_path(steps)
 
         t = np.linspace(0, 1, num = steps + 1)
-        fig = plt.figure()
-        plt.plot(t, S, color= "#000000", alpha = alpha, figure = fig)
-        return fig
+        if ax is None:
+            fig, ax = plt.subplots()
+        ax.plot(t, S, color= "#000000", alpha = alpha)
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Stock Price")
+
+        return ax
 
 class BinomialTree:
 
@@ -58,24 +63,25 @@ class BinomialTree:
         # q is the probability of going up at a step and is not necessarily the risk-neutral probability 
         rand_draw = np.random.uniform(0, 1, self.steps)
         up_seq = rand_draw < q
-        S = np.empty(self.steps + 1)
+        S = np.empty([self.steps + 1])
         S[0] = self.initial_val
         for i in range(1, self.steps + 1):
             S[i] = S[i-1] * self.u**up_seq[i -1] * self.d**(1 - up_seq[i - 1])
 
         return S
  
-    def plot_sample_paths(self, q, samples, alpha):
+    def plot_sample_paths(self, q, samples, alpha = 0.1, ax = None):
         S = np.empty([self.steps + 1, samples]) 
 
         for i in range(samples):
             S[:, i] = self.get_binomial_path(q)
 
         t = np.linspace(0, 1, self.steps + 1)
-        fig = plt.figure()
-        plt.plot(t, S, color= "#000000", alpha = alpha, figure = fig)
+        if ax is None:
+            fig, ax = plt.subplots()
+        ax.plot(t, S, color= "#000000", alpha = alpha)
 
-        return fig
+        return ax
 
 class TrinomialTree:
 
@@ -111,7 +117,8 @@ class TrinomialTree:
                 return 2
         vec_interval = np.vectorize(interval)
         seq = vec_interval(rand_draw)
-        up_seq = down_seq = np.zeros(self.steps)
+        up_seq = np.zeros(self.steps)
+        down_seq = np.zeros(self.steps)
         for i in range(self.steps):
             if seq[i] == 0:
                 up_seq[i] = 1
@@ -121,21 +128,22 @@ class TrinomialTree:
         S = np.empty(self.steps + 1)
         S[0] = self.initial_val
         for i in range(1, self.steps + 1):
-            S[i] = S[i-1] * self.u ** up_seq[i] * self.d ** down_seq[i] 
+            S[i] = S[i-1] * self.u ** up_seq[i - 1] * self.d ** down_seq[i - 1] 
 
         return S
 
-    def plot_sample_paths(self, samples, alpha):
+    def plot_sample_paths(self, samples, alpha = 0.1, ax = None):
         S = np.empty([self.steps + 1, samples])
 
         for i in range(samples):
             S[:, i] = self.get_trinomial_path()
 
         t = np.linspace(0, 1, self.steps + 1)
-        fig = plt.figure()
-        plt.plot(t, S, alpha = alpha, color = "#000000", figure = fig)
+        if ax is None:
+            fig, ax = plt.subplots()
+        ax.plot(t, S, alpha = alpha, color = "#000000")
 
-        return fig
+        return ax
         
 class Option:
 
