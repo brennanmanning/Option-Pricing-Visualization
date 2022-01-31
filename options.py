@@ -295,7 +295,7 @@ class EuropeanOption(Option):
         t = np.linspace(0, 0.999, 1000)
         x = np.linspace(low_price, high_price, 1000)
         T, X = np.meshgrid(t, x)
-        Z = self.get_Vega(T.ravel(), X.ravel()).reshape(X.shape)
+        Z = self.get_Rho(T.ravel(), X.ravel()).reshape(X.shape)
 
         return self.plot_option_surface(T, X, Z, r"$\rho$", ax)
         
@@ -314,3 +314,4 @@ class AsianOption(Option):
         Option.__init__(self, gbm, strike, interest, call, AsianValue)
 
     
+
