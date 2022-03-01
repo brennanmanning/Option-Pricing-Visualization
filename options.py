@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
-
+# Stock Price Processes
 class GeometricBrownianMotion:
 
     def __init__(self, drift, volatility, initial_val):
