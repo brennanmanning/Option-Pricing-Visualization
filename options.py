@@ -80,6 +80,7 @@ class BinomialTree:
         if ax is None:
             fig, ax = plt.subplots()
         ax.plot(t, S, color= "#000000", alpha = alpha)
+        ax.set(xlabel = "Time", ylabel = "Stock Price")
 
         return ax
 
@@ -142,7 +143,8 @@ class TrinomialTree:
         if ax is None:
             fig, ax = plt.subplots()
         ax.plot(t, S, alpha = alpha, color = "#000000")
-
+        ax.set(xlabel = "Time", ylabel = "Stock Price")
+        
         return ax
         
 class Option:
